@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from routers import chat
 
-load_dotenv()  # loads OPENAI_API_KEY from .env file
+load_dotenv()  # loads GROQ_API_KEY from .env file
 
 app = FastAPI(title="Language Tutor Agent")
 
