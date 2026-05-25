@@ -3,8 +3,8 @@
 AI-powered language tutor. Chat with Max in English or German — he auto-detects your language and responds accordingly.
 
 ## Stack
-- **Frontend:** HTML/CSS/JS → deployed on Vercel
-- **Backend:** FastAPI (Python) → deployed on Render
+- **Frontend:** HTML/CSS/JS
+- **Backend:** FastAPI (Python) 
 - **AI:** Groq (LLaMA 3.3 70B) — free
 
 ## Local Development
@@ -23,6 +23,5 @@ uvicorn main:app --reload
 ```bash
 cd test_ui
 npx serve .
-# Open http://localhost:3000
 ```
 
