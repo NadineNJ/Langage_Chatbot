@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sprachly — AI Language Tutor</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232563eb'/><text y='.9em' font-size='72' x='50%' dominant-baseline='auto' text-anchor='middle'>💬</text></svg>">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f172a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      width: 100%;
+      background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #0ea5e9 100%);
+      padding: 48px 24px 64px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=1400&q=80") center/cover no-repeat;
+      opacity: 0.15;
+    }
+
+    .hero-content { position: relative; z-index: 1; }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      background: white;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+    }
+
+    .logo-text {
+      font-size: 32px;
+      font-weight: 800;
+      color: white;
+      letter-spacing: -1px;
+    }
+
+    .logo-text span { color: #7dd3fc; }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: white;
+      font-size: 13px;
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+      backdrop-filter: blur(4px);
+    }
+
+    .hero p {
+      font-size: 17px;
+      color: rgba(255,255,255,0.85);
+      max-width: 480px;
+      margin: 0 auto 28px;
+      line-height: 1.6;
+    }
+
+    .lang-pills {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .lang-pill {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: white;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      backdrop-filter: blur(4px);
+    }
+
+    /* ── CHAT WRAPPER ── */
+    .chat-wrapper {
+      width: 100%;
+      max-width: 720px;
+      margin-top: -32px;
+      padding: 0 16px 40px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      display: flex;
+      flex-direction: column;
+      height: 600px;
+      overflow: hidden;
+    }
+
+    /* ── CHAT HEADER ── */
+    .chat-header {
+      background: #1e293b;
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+    }
+
+    .chat-header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .tutor-avatar-fallback {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #0ea5e9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      border: 2px solid #3b82f6;
+      flex-shrink: 0;
+    }
+
+    .tutor-info h2 { font-size: 16px; font-weight: 600; }
+    .tutor-info p  { font-size: 12px; color: #94a3b8; }
+
+    .online-dot {
+      width: 8px; height: 8px;
+      background: #22c55e;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 5px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.4; }
+    }
+
+    /* ── LANG BAR ── */
+    .lang-bar {
+      padding: 10px 20px;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    /* ── MESSAGES ── */
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      background: #f8fafc;
+    }
+
+    .messages::-webkit-scrollbar { width: 4px; }
+    .messages::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+    .message {
+      max-width: 78%;
+      padding: 12px 16px;
+      border-radius: 16px;
+      font-size: 14.5px;
+      line-height: 1.65;
+      white-space: pre-wrap;
+    }
+
+    .message.user {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+
+    .message.agent {
+      background: white;
+      color: #1e293b;
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+
+    .message.agent .name {
+      font-size: 11px;
+      font-weight: 700;
+      color: #3b82f6;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── TYPING ── */
+    .typing {
+      align-self: flex-start;
+      background: white;
+      border-radius: 16px;
+      border-bottom-left-radius: 4px;
+      padding: 14px 18px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      display: none;
+    }
+
+    .typing span {
+      display: inline-block;
+      width: 7px; height: 7px;
+      background: #94a3b8;
+      border-radius: 50%;
+      margin: 0 2px;
+      animation: bounce 1.2s infinite;
+    }
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: translateY(0); }
+      40%           { transform: translateY(-6px); }
+    }
+
+    /* ── INPUT ── */
+    .input-area {
+      padding: 14px 16px;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      gap: 10px;
+      background: white;
+      align-items: flex-end;
+    }
+
+    .input-area textarea {
+      flex: 1;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 14px;
+      resize: none;
+      outline: none;
+      font-family: inherit;
+      max-height: 120px;
+      transition: border-color 0.2s;
+      background: #f8fafc;
+      color: #1e293b;
+    }
+
+    .input-area textarea:focus { border-color: #3b82f6; background: white; }
+
+    .input-area button {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 22px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      white-space: nowrap;
+    }
+
+    .input-area button:hover    { opacity: 0.9; transform: translateY(-1px); }
+    .input-area button:active   { transform: translateY(0); }
+    .input-area button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* ── ERROR ── */
+    .error-banner {
+      background: #fef2f2;
+      color: #dc2626;
+      padding: 10px 20px;
+      font-size: 13px;
+      border-top: 1px solid #fecaca;
+      display: none;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      color: #475569;
+      font-size: 12px;
+      text-align: center;
+      padding: 0 0 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-content">
+      <div class="logo">
+        <div class="logo-icon">💬</div>
+        <div class="logo-text">Sprach<span>ly</span></div>
+      </div>
+      <div class="hero-badge">✨ AI-Powered Language Tutor</div>
+<p>
+  Chat with Maxin, your personal AI language tutor. Practice anything you want - grammar, vocabulary, pronunciation, or natural conversations in English and German.
+</p>      <div class="lang-pills">
+        <span class="lang-pill">🇩🇪 German</span>
+        <span class="lang-pill">🇬🇧 English</span>
+        <span class="lang-pill">🌍 More coming soon</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="chat-wrapper">
+    <div class="container">
+
+      <div class="chat-header">
+        <div class="chat-header-left">
+          <div class="tutor-avatar-fallback">🤖</div>
+          <div class="tutor-info">
+            <h2>Maxin - Sprachly Tutor</h2>
+            <p><span class="online-dot"></span>Online - speaks English &amp; German</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="lang-bar">
+        💬 Maxin speaks <strong>🇩🇪 German</strong> &amp; <strong>🇬🇧 English</strong> - just type in either language, he'll follow your lead!
+      </div>
+
+      <div class="error-banner" id="errorBanner"></div>
+
+      <div class="messages" id="messages">
+        <div class="message agent">
+          <div class="name">Maxin 🇩🇪🇬🇧</div>Hallo! / Hello! I'm Maxin, your Sprachly tutor. You can talk to me in English or German - I'll follow your lead! Ask me anything about grammar, vocabulary, pronunciation, or just practice conversation. Was möchtest du lernen? (What would you like to learn?)
+        </div>
+      </div>
+
+      <div class="typing" id="typing">
+        <span></span><span></span><span></span>
+      </div>
+
+      <div class="input-area">
+        <textarea id="userInput" rows="1" placeholder="Ask something... e.g. How do I say 'I am tired' in German?"></textarea>
+        <button id="sendBtn" onclick="sendMessage()">Send ➤</button>
+      </div>
+
+    </div>
+    <div class="footer">Sprachly · Powered by Groq &amp; LLaMA 3.3 70B · Free to use</div>
+  </div>
+
+  <script>
+    // ── CONFIG ──────────────────────────────────────────────────────────────
+    // For local dev, points to local backend.
+    // For production, replace the URL below with your Render backend URL.
+    const API_URL = window.SPRACHLY_API_URL || "https://your-sprachly-backend.onrender.com/api/chat";
+    // ────────────────────────────────────────────────────────────────────────
+
+    let conversationHistory = [];
+
+    const messagesEl  = document.getElementById("messages");
+    const inputEl     = document.getElementById("userInput");
+    const sendBtn     = document.getElementById("sendBtn");
+    const typingEl    = document.getElementById("typing");
+    const errorBanner = document.getElementById("errorBanner");
+
+    // Auto-resize textarea
+    inputEl.addEventListener("input", () => {
+      inputEl.style.height = "auto";
+      inputEl.style.height = inputEl.scrollHeight + "px";
+    });
+
+    // Send on Enter (Shift+Enter = new line)
+    inputEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    function addMessage(role, text) {
+      const div = document.createElement("div");
+      div.className = `message ${role === "user" ? "user" : "agent"}`;
+      if (role === "agent") {
+        const name = document.createElement("div");
+        name.className = "name";
+        name.textContent = "Maxin 🇩🇪🇬🇧";
+        div.appendChild(name);
+      }
+      const content = document.createElement("span");
+      content.textContent = text;
+      div.appendChild(content);
+      messagesEl.appendChild(div);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function showError(msg) {
+      errorBanner.textContent = msg;
+      errorBanner.style.display = "block";
+      setTimeout(() => errorBanner.style.display = "none", 6000);
+    }
+
+    async function sendMessage() {
+      const text = inputEl.value.trim();
+      if (!text) return;
+
+      addMessage("user", text);
+      conversationHistory.push({ role: "user", content: text });
+
+      inputEl.value = "";
+      inputEl.style.height = "auto";
+      sendBtn.disabled = true;
+      typingEl.style.display = "block";
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: text,
+            language: "german",
+            conversation_history: conversationHistory.slice(-20),
+          }),
+        });
+
+        if (!response.ok) {
+          const err = await response.json();
+          throw new Error(err.detail || "Server error");
+        }
+
+        const data = await response.json();
+        conversationHistory.push({ role: "assistant", content: data.reply });
+        typingEl.style.display = "none";
+        addMessage("agent", data.reply);
+
+      } catch (err) {
+        typingEl.style.display = "none";
+        showError("Error: " + err.message + " — Is the backend running?");
+      } finally {
+        sendBtn.disabled = false;
+        inputEl.focus();
+      }
+    }
+  </script>
+</body>
+</html>
