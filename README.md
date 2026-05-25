@@ -26,18 +26,3 @@ npx serve .
 # Open http://localhost:3000
 ```
 
-## Deployment
-
-### Backend → Render.com
-1. Push to GitHub
-2. Create new Web Service on render.com
-3. Connect your repo, set root to `backend/`
-4. Add environment variable: `GROQ_API_KEY` = your key
-5. Copy the Render URL (e.g. `https://sprachly-backend.onrender.com`)
-
-### Frontend → Vercel
-1. Update `API_URL` in `test_ui/index.html` to your Render backend URL
-2. Deploy `test_ui/` folder to Vercel
-
-## Adding a New Language
-Edit `backend/services/prompts.py` and add a new entry to `LANGUAGE_PROMPTS`.
