@@ -1,6 +1,6 @@
 # Sprachly 💬
 
-AI-powered language tutor. Chat with Max in English or German — he auto-detects your language and responds accordingly.
+AI-powered language tutor. Chat with Maxin in English or German — he auto-detects your language and responds accordingly.
 
 ## Stack
 - **Frontend:** HTML/CSS/JS
