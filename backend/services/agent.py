@@ -34,7 +34,7 @@ async def get_agent_response(message: str, language: str, history: list) -> str:
     messages.append({"role": "user", "content": message})
 
     response = await client.chat.completions.create(
-        model="gemma2-9b-it",  # better at following custom identity/persona
+        model="llama-3.3-70b-versatile",  # better at following custom identity/persona
         messages=messages,
         temperature=0.85,
         max_tokens=400,
