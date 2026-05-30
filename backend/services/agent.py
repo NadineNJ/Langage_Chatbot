@@ -34,7 +34,7 @@ async def get_agent_response(message: str, language: str, history: list) -> str:
     messages.append({"role": "user", "content": message})
 
     response = await client.chat.completions.create(
-        model="llama-3.3-70b-versatile",  # Groq's best free model
+        model="gemma2-9b-it",  # better at following custom identity/persona
         messages=messages,
         temperature=0.85,
         max_tokens=400,
